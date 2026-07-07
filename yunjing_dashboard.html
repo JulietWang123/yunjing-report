@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>沄璟架空层提升方案 · 综合 Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --primary: #1B4332;
+    --g1: #2D6A4F;
+    --g2: #40916C;
+    --g3: #52B788;
+    --g4: #74C69D;
+    --accent: #B7E4C7;
+    --gold: #D4A017;
+    --female: #BE185D;
+    --female-light: #FCE7F3;
+    --sport: #1D4ED8;
+    --bg: #0D1B14;
+    --bg2: #152C1E;
+    --card: #1C2E22;
+    --card2: #213529;
+    --text: #E8F5EE;
+    --muted: #7CA882;
+    --border: #2A4035;
+    --red: #EF4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+  /* Top Nav */
+  .topnav { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; }
+  .topnav-brand { font-size: 15px; font-weight: 800; color: var(--g3); letter-spacing: 0.5px; }
+  .topnav-links { display: flex; gap: 4px; }
+  .nav-link { padding: 6px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; color: var(--muted); transition: all 0.2s; border: none; background: none; }
+  .nav-link.active, .nav-link:hover { background: var(--g1); color: white; }
+  .topnav-date { font-size: 12px; color: var(--muted); }
+
+  /* Hero */
+  .hero { background: linear-gradient(135deg, var(--primary) 0%, #0D2B1D 50%, var(--bg) 100%); padding: 48px 28px 40px; border-bottom: 1px solid var(--border); }
+  .hero-inner { max-width: 1280px; margin: 0 auto; }
+  .hero h1 { font-size: 32px; font-weight: 900; line-height: 1.3; margin-bottom: 10px; }
+  .hero h1 span { color: var(--g3); }
+  .hero-sub { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+  .hero-kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+  @media (max-width: 900px) { .hero-kpis { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 500px) { .hero-kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--card); border-radius: 12px; padding: 18px 14px; border: 1px solid var(--border); text-align: center; }
+  .kpi-num { font-size: 32px; font-weight: 900; line-height: 1; }
+  .kpi-unit { font-size: 13px; font-weight: 600; }
+  .kpi-label { font-size: 11px; color: var(--muted); margin-top: 5px; }
+  .kpi-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  /* Page sections */
+  .page { display: none; max-width: 1280px; margin: 0 auto; padding: 32px 28px; }
+  .page.active { display: block; }
+
+  /* Grid layouts */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  @media (max-width: 900px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+  /* Cards */
+  .card { background: var(--card); border-radius: 14px; border: 1px solid var(--border); overflow: hidden; }
+  .card-header { padding: 18px 20px 12px; border-bottom: 1px solid var(--border); }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--text); }
+  .card-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .card-body { padding: 18px 20px; }
+  .card-full { grid-column: 1 / -1; }
+
+  /* Charts */
+  .chart-wrap { position: relative; }
+  .h220 { height: 220px; }
+  .h260 { height: 260px; }
+  .h300 { height: 300px; }
+  .h320 { height: 320px; }
+  .h360 { height: 360px; }
+
+  /* Section header */
+  .sec-header { margin-bottom: 22px; }
+  .sec-title { font-size: 18px; font-weight: 800; color: var(--g3); margin-bottom: 4px; }
+  .sec-desc { font-size: 13px; color: var(--muted); }
+
+  /* Insight chips */
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0; }
+  .chip { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 5px 14px; font-size: 12px; color: var(--muted); }
+  .chip.hot { background: rgba(82,183,136,0.15); border-color: var(--g3); color: var(--g3); font-weight: 600; }
+  .chip.female { background: rgba(190,24,93,0.15); border-color: var(--female); color: #F472B6; }
+  .chip.alert { background: rgba(239,68,68,0.12); border-color: var(--red); color: #FCA5A5; }
+
+  /* Data table */
+  .dt { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .dt th { padding: 9px 12px; text-align: left; font-weight: 600; color: var(--muted); border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .dt td { padding: 9px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text); }
+  .dt tr:hover td { background: var(--bg2); }
+  .dt .val-high { color: var(--g3); font-weight: 700; }
+  .dt .val-female { color: #F472B6; font-weight: 700; }
+  .dt .val-low { color: var(--red); }
+
+  /* Progress bars */
+  .prog-row { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .prog-label { font-size: 12px; color: var(--text); width: 110px; flex-shrink: 0; }
+  .prog-outer { flex: 1; background: var(--bg); border-radius: 6px; height: 18px; overflow: hidden; }
+  .prog-bar { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 600; color: white; }
+  .prog-pct { font-size: 12px; font-weight: 700; color: var(--text); width: 46px; text-align: right; flex-shrink: 0; }
+
+  /* Building cards */
+  .bld-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media (max-width: 900px) { .bld-grid { grid-template-columns: repeat(2, 1fr); } }
+  .bld-card { background: var(--card2); border-radius: 10px; border: 1px solid var(--border); padding: 14px; }
+  .bld-num { font-size: 22px; font-weight: 900; line-height: 1; }
+  .bld-name { font-size: 12px; color: var(--muted); margin-top: 2px; margin-bottom: 8px; }
+  .bld-theme { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .bld-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+  .bld-tag { font-size: 10px; border-radius: 6px; padding: 2px 7px; }
+
+  /* Timeline / status */
+  .status-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .status-dot.done { background: var(--g3); }
+  .status-dot.pending { background: var(--gold); }
+  .status-dot.todo { background: var(--border); }
+  .status-text { font-size: 13px; flex: 1; }
+  .status-badge { font-size: 11px; border-radius: 8px; padding: 2px 9px; }
+  .badge-done { background: rgba(82,183,136,0.15); color: var(--g3); }
+  .badge-pending { background: rgba(212,160,23,0.15); color: var(--gold); }
+  .badge-todo { background: var(--bg); color: var(--muted); }
+
+  /* 15幢 special */
+  .bld15 { background: linear-gradient(135deg, #1A0612, #2D0B21); border: 1px solid #BE185D; }
+  .bld15 .bld-num { color: #F472B6; }
+  .bld15 .bld-theme { color: #F9A8D4; }
+
+  /* Divider */
+  .divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* Recommendation box */
+  .rec-box { background: linear-gradient(135deg, rgba(45,106,79,0.25), rgba(64,145,108,0.1)); border: 1px solid var(--g2); border-radius: 12px; padding: 20px; margin-bottom: 14px; }
+  .rec-box h4 { font-size: 14px; font-weight: 700; color: var(--g3); margin-bottom: 8px; }
+  .rec-box p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+  .rec-box.female-box { background: linear-gradient(135deg, rgba(190,24,93,0.15), rgba(244,114,182,0.05)); border-color: #BE185D; }
+  .rec-box.female-box h4 { color: #F472B6; }
+
+  /* Quote */
+  .quote { background: var(--bg2); border-left: 3px solid var(--g3); border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 14px 0; font-size: 13px; color: var(--muted); line-height: 1.8; }
+  .quote strong { color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- Top Nav -->
+<div class="topnav">
+  <div class="topnav-brand">沄璟 · 架空层提升方案 Dashboard</div>
+  <div class="topnav-links">
+    <button class="nav-link active" onclick="showPage('overview')">概览</button>
+    <button class="nav-link" onclick="showPage('survey')">需求调研</button>
+    <button class="nav-link" onclick="showPage('plan')">分区方案</button>
+    <button class="nav-link" onclick="showPage('action')">行动计划</button>
+  </div>
+  <div class="topnav-date">2026.07.07</div>
+</div>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-inner">
+    <h1>沄璟 <span>全龄乐活会廊</span><br>架空层提升综合方案</h1>
+    <div class="hero-sub">数据驱动 · 女性友好 · 运动健康优先 · 面向年轻家庭</div>
+    <div class="hero-kpis">
+      <div class="kpi">
+        <div class="kpi-num" style="color:var(--g3)">22</div>
+        <div class="kpi-label">有效问卷样本</div>
+        <div class="kpi-sub">1幢业主参与</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-num" style="color:var(--g3)">95<span class="kpi-unit">%</span></div>
+        <div class="kpi-label">需要跑步机</div>
+        <div class="kpi-sub">最高需求率</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-num" style="color:#F472B6">77<span class="kpi-unit">%</span></div>
+        <div class="kpi-label">女性需要瑜伽舞房</div>
+        <div class="kpi-sub">品质需求集中</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-num" style="color:var(--gold)">0</div>
+        <div class="kpi-label">麻将高频用户</div>
+        <div class="kpi-sub">每周4次以上</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-num" style="color:var(--g3)">12</div>
+        <div class="kpi-label">楼幢升级主题</div>
+        <div class="kpi-sub">6幢至19幢</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-num" style="color:#F472B6">4</div>
+        <div class="kpi-label">关键决策待确认</div>
+        <div class="kpi-sub">急需开发商回应</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: OVERVIEW ===== -->
+<div id="page-overview" class="page active">
+  <div class="sec-header">
+    <div class="sec-title">核心洞察概览</div>
+    <div class="sec-desc">整合业主调研数据与架空层优化方案的关键结论</div>
+  </div>
+
+  <div class="grid-3" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">需求强度分布</div>
+        <div class="card-sub">各功能"非常需要+需要"综合占比</div>
+      </div>
+      <div class="card-body">
+        <div class="chart-wrap h260"><canvas id="ov-needs"></canvas></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">使用频率热力</div>
+        <div class="card-sub">每周4次以上高频用户对比（"日常刚需"验证）</div>
+      </div>
+      <div class="card-body">
+        <div class="chart-wrap h260"><canvas id="ov-freq"></canvas></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">样本画像</div>
+        <div class="card-sub">22名参与业主基本特征</div>
+      </div>
+      <div class="card-body">
+        <div class="prog-row"><div class="prog-label">女性</div><div class="prog-outer"><div class="prog-bar" style="width:59%;background:#BE185D">59.1%</div></div><div class="prog-pct" style="color:#F472B6">59%</div></div>
+        <div class="prog-row"><div class="prog-label">26-35岁</div><div class="prog-outer"><div class="prog-bar" style="width:45%;background:var(--g1)">45.5%</div></div><div class="prog-pct">46%</div></div>
+        <div class="prog-row"><div class="prog-label">36-45岁</div><div class="prog-outer"><div class="prog-bar" style="width:27%;background:var(--g2)">27.3%</div></div><div class="prog-pct">27%</div></div>
+        <div class="prog-row"><div class="prog-label">3人+家庭</div><div class="prog-outer"><div class="prog-bar" style="width:86%;background:var(--g3)">86.4%</div></div><div class="prog-pct">86%</div></div>
+        <div class="prog-row"><div class="prog-label">运动健身兴趣</div><div class="prog-outer"><div class="prog-bar" style="width:86%;background:var(--g1)">86.4%</div></div><div class="prog-pct">86%</div></div>
+        <div class="prog-row"><div class="prog-label">瑜伽舞蹈兴趣</div><div class="prog-outer"><div class="prog-bar" style="width:50%;background:#BE185D">50.0%</div></div><div class="prog-pct" style="color:#F472B6">50%</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">五大核心结论</div>
+        <div class="card-sub">基于调研数据的关键发现</div>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div style="width:24px;height:24px;background:var(--g1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">1</div>
+            <div style="font-size:13px"><strong style="color:var(--g3)">运动健身是最强共识。</strong>兴趣选择86.36%，跑步机需求95.45%，常规器械90.91%。</div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div style="width:24px;height:24px;background:var(--g1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">2</div>
+            <div style="font-size:13px"><strong style="color:var(--g3)">健身是男女共同刚需。</strong>男性跑步机需求88.89%，女性100%，无性别差异。</div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div style="width:24px;height:24px;background:#BE185D;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">3</div>
+            <div style="font-size:13px"><strong style="color:#FCA5A5">瑜伽/普拉提是女性品质场景。</strong>总体需求68.18%，77.27%业主会使用，15人每周≥2次。</div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div style="width:24px;height:24px;background:var(--g1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">4</div>
+            <div style="font-size:13px"><strong style="color:var(--g3)">年轻家庭是绝对主体。</strong>26-45岁占72.72%，3人+家庭86.36%，对品质期待高。</div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start">
+            <div style="width:24px;height:24px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">!</div>
+            <div style="font-size:13px"><strong style="color:#FCA5A5">麻将高频用户为0。</strong>每周4次+为0人；vs 瑜伽/普拉提12人（54.55%）。方案应调整面积配比。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">四项关键决策</div>
+        <div class="card-sub">最需开发商明确的核心选择</div>
+      </div>
+      <div class="card-body">
+        <div class="status-row">
+          <div class="status-dot pending"></div>
+          <div class="status-text"><strong>15幢全封闭方案</strong>——保留并扩大瑜伽舞房+普拉提室+私教房</div>
+          <div class="status-badge badge-pending">待确认</div>
+        </div>
+        <div class="status-row">
+          <div class="status-dot pending"></div>
+          <div class="status-text"><strong>女性空间装标不低于男性空间</strong>——14幢≥19幢绅士会所标准</div>
+          <div class="status-badge badge-pending">待确认</div>
+        </div>
+        <div class="status-row">
+          <div class="status-dot pending"></div>
+          <div class="status-text"><strong>10幢增设45㎡健身房</strong>——从麻将室改造，形成运动矩阵</div>
+          <div class="status-badge badge-pending">已上报</div>
+        </div>
+        <div class="status-row" style="border:none">
+          <div class="status-dot todo"></div>
+          <div class="status-text"><strong>18幢右侧改镜面运动区</strong>——从麻将改为瑜伽/拉伸多功能区</div>
+          <div class="status-badge badge-todo">建议提出</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 楼幢一览 -->
+  <div class="card" style="margin-bottom:18px">
+    <div class="card-header">
+      <div class="card-title">12幢架空层主题升级一览</div>
+      <div class="card-sub">沄璟全龄乐活会廊 · 主题不推翻，表达再升级</div>
+    </div>
+    <div class="card-body">
+      <div class="bld-grid">
+        <div class="bld-card"><div class="bld-num" style="color:var(--muted)">6幢</div><div class="bld-name">文化娱乐</div><div class="bld-theme" style="color:var(--g4)">雅趣文化可变厅</div><div class="bld-tags"><span class="bld-tag" style="background:rgba(64,145,108,0.2);color:var(--g3)">家庭</span><span class="bld-tag" style="background:rgba(64,145,108,0.1);color:var(--muted)">可变</span></div></div>
+        <div class="bld-card"><div class="bld-num" style="color:var(--muted)">7幢</div><div class="bld-name">会所茶室</div><div class="bld-theme" style="color:var(--g4)">云上书茶雅集馆</div><div class="bld-tags"><span class="bld-tag" style="background:rgba(100,100,200,0.2);color:#A5B4FC">会客</span></div></div>
+        <div class="bld-card"><div class="bld-num" style="color:var(--muted)">9幢</div><div class="bld-name">会所会客</div><div class="bld-theme" style="color:var(--g4)">礼序会客共享厅</div><div class="bld-tags"><span class="bld-tag" style="background:rgba(100,100,200,0.2);color:#A5B4FC">会客</span></div></div>
+        <div class="bld-card"><div class="bld-num" style="color:var(--g3)">10幢</div><div class="bld-name">自习+新增健身</div><div class="bld-theme" style="color:var(--g3)">知行活力馆</div><div class="bld-tags"><span class="bld-tag" style="background:rgba(29,78,216,0.2);color:#93C5FD">运动</span><span class="bld-tag" style="background:rgba(212,160,23,0.2);color:var(--gold)">待审批</span></div></div>
+        <div class="bld-card"><div class="bld-num" style="color:var(--g3)">12幢</div><div class="bld-name">青年运动</div><div class="bld-theme" style="color:var(--g3)">青年活力运动馆</div><div class="bld-tags"><span class="bld-tag" style="background:rgba(29,78,216,0.2);color:#93C5FD">运动</span><span class="bld-tag" style="background:rgba(64,145,108,0.2);color:var(--g3)">镜墙</span></div></div>
+        <div class="bld-card"><div class="bld-num" style="color:var(--gold)">13幢</div><div class="bld-name">儿童活动</div><div class="bld-theme" style="color:var(--gold)">童梦成长乐园</div><div class="bld-tags"><span class="bld-tag" style="background:rgba(212,160,23,0.2);color:var(--gold)">家庭</span><span class="bld-tag" style="background:rgba(212,160,23,0.1);color:var(--muted)">童玩</span></div></div>
+        <div class="bld-card"><div class="bld-num" style="color:#F472B6">14幢</div><div class="bld-name">社交女王空间</div><div class="bld-theme" style="color:#F472B6">她享美学社交馆</div><div class="bld-tags"><span class="bld-tag" style="background:rgba(190,24,93,0.2);color:#F472B6">女性</span><span class="bld-tag" style="background:rgba(190,24,93,0.1);color:var(--muted)">装标≥19</span></div></div>
+        <div class="bld-card bld15"><div class="bld-num">15幢★</div><div class="bld-name" style="color:#F9A8D4">瑜伽普拉提（重点）</div><div class="bld-theme">她享身心会馆</div><div class="bld-tags"><span class="bld-tag" style="background:rgba(190,24,93,0.3);color:#F472B6">女性</span><span class="bld-tag" style="background:rgba(190,24,93,0.2);color:#FDA4AF">全封闭</span><span class="bld-tag" style="background:rgba(212,160,23,0.2);color:var(--gold)">待确认</span></div></div>
+        <div class="bld-card"><div class="bld-num" style="color:var(--muted)">16幢</div><div class="bld-name">自然科普展廊</div><div class="bld-theme" style="color:var(--g4)">森氧自然疗愈厅</div><div class="bld-tags"><span class="bld-tag" style="background:rgba(64,145,108,0.15);color:var(--muted)">文化</span></div></div>
+        <div class="bld-card"><div class="bld-num" style="color:var(--muted)">17幢</div><div class="bld-name">自习+棋牌</div><div class="bld-theme" style="color:var(--g4)">邻里弈乐会馆</div><div class="bld-tags"><span class="bld-tag" style="background:rgba(100,100,100,0.2);color:var(--muted)">棋牌</span><span class="bld-tag" style="background:rgba(64,145,108,0.1);color:var(--muted)">卫生间</span></div></div>
+        <div class="bld-card"><div class="bld-num" style="color:#A78BFA">18幢</div><div class="bld-name">自习+麻将（建议调整）</div><div class="bld-theme" style="color:#A78BFA">轻学轻运动馆</div><div class="bld-tags"><span class="bld-tag" style="background:rgba(167,139,250,0.2);color:#A78BFA">运动</span><span class="bld-tag" style="background:rgba(212,160,23,0.2);color:var(--gold)">建议改</span></div></div>
+        <div class="bld-card"><div class="bld-num" style="color:var(--muted)">19幢</div><div class="bld-name">绅士会所</div><div class="bld-theme" style="color:var(--g4)">菁英商务会客厅</div><div class="bld-tags"><span class="bld-tag" style="background:rgba(100,100,200,0.2);color:#A5B4FC">会客</span><span class="bld-tag" style="background:rgba(64,145,108,0.1);color:var(--muted)">装标参考</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: SURVEY ===== -->
+<div id="page-survey" class="page">
+  <div class="sec-header">
+    <div class="sec-title">业主需求调研数据详情</div>
+    <div class="sec-desc">沄璟1幢，22份有效问卷，2026年7月6日采集</div>
+  </div>
+  <div class="chips">
+    <span class="chip hot">运动健身 86.36%</span>
+    <span class="chip hot">跑步机需求 95.45%</span>
+    <span class="chip female">瑜伽/普拉提女性需求 76.92%</span>
+    <span class="chip alert">麻将高频用户 0人</span>
+    <span class="chip">26-45岁 72.72%</span>
+    <span class="chip">3人+家庭 86.36%</span>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header"><div class="card-title">兴趣爱好分布</div><div class="card-sub">多选题，22人样本，按选择人数排序</div></div>
+      <div class="card-body"><div class="chart-wrap h300"><canvas id="sv-hobbies"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">功能需求"非常需要+需要"对比</div><div class="card-sub">蓝色为运动类，粉色为女性品质类</div></div>
+      <div class="card-body"><div class="chart-wrap h300"><canvas id="sv-needs"></canvas></div></div>
+    </div>
+  </div>
+
+  <div class="grid-3" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header"><div class="card-title">性别结构</div><div class="card-sub">女性59.09%，参与度更高</div></div>
+      <div class="card-body"><div class="chart-wrap h220"><canvas id="sv-gender"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">年龄结构</div><div class="card-sub">26-45岁合计72.72%</div></div>
+      <div class="card-body"><div class="chart-wrap h220"><canvas id="sv-age"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">家庭人口</div><div class="card-sub">3人及以上86.36%</div></div>
+      <div class="card-body"><div class="chart-wrap h220"><canvas id="sv-family"></canvas></div></div>
+    </div>
+  </div>
+
+  <div class="card card-full" style="margin-bottom:18px">
+    <div class="card-header"><div class="card-title">各场景使用频率完整对比</div><div class="card-sub">越高越右代表"使用率高+频率高"，是真正值得投入的功能</div></div>
+    <div class="card-body">
+      <div class="chart-wrap h320"><canvas id="sv-freq-full"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div class="card-title">男女需求对比（核心功能）</div><div class="card-sub">"非常需要+需要"百分比，男性9人，女性13人</div></div>
+      <div class="card-body"><div class="chart-wrap h260"><canvas id="sv-gender-comp"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">使用频率完整数据表</div><div class="card-sub">22人样本</div></div>
+      <div class="card-body" style="overflow-x:auto">
+        <table class="dt">
+          <thead><tr><th>场景</th><th>会使用</th><th>周≥2次</th><th>周≥4次</th></tr></thead>
+          <tbody>
+            <tr><td>健身相关区域</td><td class="val-high">95.45%</td><td class="val-high">95.45%</td><td class="val-high">50.00%</td></tr>
+            <tr><td>乒乓球区域</td><td>86.36%</td><td>59.09%</td><td>22.73%</td></tr>
+            <tr><td>待客/休息区</td><td>86.36%</td><td>50.00%</td><td>9.09%</td></tr>
+            <tr><td style="color:#F472B6">瑜伽/普拉提区域</td><td class="val-female">77.27%</td><td class="val-female">68.18%</td><td class="val-female">54.55%</td></tr>
+            <tr><td>童玩区</td><td>77.27%</td><td>68.18%</td><td>50.00%</td></tr>
+            <tr><td>阅读/书画区</td><td>77.27%</td><td>50.00%</td><td>13.64%</td></tr>
+            <tr><td>麻将/桌游区</td><td>77.27%</td><td>36.36%</td><td class="val-low">0%</td></tr>
+            <tr><td>自习室</td><td>72.73%</td><td>40.91%</td><td>13.64%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: PLAN ===== -->
+<div id="page-plan" class="page">
+  <div class="sec-header">
+    <div class="sec-title">架空层分区优化方案</div>
+    <div class="sec-desc">四条功能主线 · 12幢升级主题 · 核心原则不变，表达升级</div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header"><div class="card-title">四条功能主线分布</div><div class="card-sub">各楼幢按主线归类</div></div>
+      <div class="card-body"><div class="chart-wrap h260"><canvas id="pl-lines"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">需求强度 vs 现有配置优先级</div><div class="card-sub">圆圈越大代表应获得更多面积投入</div></div>
+      <div class="card-body"><div class="chart-wrap h260"><canvas id="pl-bubble"></canvas></div></div>
+    </div>
+  </div>
+
+  <!-- 15幢方案详解 -->
+  <div class="card" style="border:1px solid #BE185D; margin-bottom:18px">
+    <div class="card-header" style="background:linear-gradient(135deg,#1A0612,#2D0B21);border-bottom:1px solid #BE185D">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div class="card-title" style="color:#F472B6;font-size:16px">15幢重点方案 · 她享身心会馆</div>
+          <div class="card-sub" style="color:#F9A8D4">瑜伽 × 普拉提 × 私教预约 · 女性私享运动专区</div>
+        </div>
+        <div style="font-size:11px;color:var(--gold);background:rgba(212,160,23,0.15);border-radius:8px;padding:4px 10px;">🔥 优先级最高</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="grid-2">
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#F472B6;margin-bottom:10px">❌ 开发商当前方案的问题</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="background:rgba(239,68,68,0.1);border-radius:6px;padding:8px 12px;font-size:12px;color:#FCA5A5">原普拉提室改为开放休息区，净增封闭面积极为有限</div>
+            <div style="background:rgba(239,68,68,0.1);border-radius:6px;padding:8px 12px;font-size:12px;color:#FCA5A5">通道穿越导致瑜伽室私密性差，男性可穿行</div>
+            <div style="background:rgba(239,68,68,0.1);border-radius:6px;padding:8px 12px;font-size:12px;color:#FCA5A5">开放区运动后出入容易感冒，不符合运动空间要求</div>
+            <div style="background:rgba(239,68,68,0.1);border-radius:6px;padding:8px 12px;font-size:12px;color:#FCA5A5">未满足15幢业主"封闭带空调休息区"的明确诉求</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--g3);margin-bottom:10px">✅ 推荐修改方案</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="background:rgba(82,183,136,0.1);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--g4)">左侧：封闭休息区（独立动线，不穿越运动区）</div>
+            <div style="background:rgba(82,183,136,0.1);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--g4)">中间水吧区：改为私教小房间（预约制）</div>
+            <div style="background:rgba(82,183,136,0.1);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--g4)">右侧原普拉提室位置：保留封闭，配合瑜伽室联通</div>
+            <div style="background:rgba(82,183,136,0.1);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--g4)">整体全封闭，形成女性私享运动专区</div>
+          </div>
+        </div>
+      </div>
+      <div class="quote" style="margin-top:14px">
+        <strong>对开发商的包装建议：</strong> 将15幢定位为"杭州之江最具品质的住宅女性运动会馆"。沄璟轻法式设计+之江气质，天然吸引年轻女性。瑜伽/普拉提每周4次+潜在用户12人（54.55%），具备社群运营基础。装标需不低于19幢绅士会所，才能与"以业主为本"的宣传定位匹配。
+      </div>
+    </div>
+  </div>
+
+  <!-- 分区总表 -->
+  <div class="card">
+    <div class="card-header"><div class="card-title">12幢功能升级总表</div><div class="card-sub">主题、功能场景、装标要求一览</div></div>
+    <div class="card-body" style="overflow-x:auto">
+      <table class="dt">
+        <thead><tr><th>楼幢</th><th>升级主题</th><th>主线</th><th>左侧功能</th><th>右侧功能</th><th>装标重点</th></tr></thead>
+        <tbody>
+          <tr><td>6幢</td><td style="color:var(--g4)">雅趣文化可变厅</td><td>家庭</td><td>桌游、轻影音</td><td>书画茶艺、手作讲堂</td><td>可移动桌椅、投影</td></tr>
+          <tr><td>7幢</td><td style="color:var(--g4)">云上书茶雅集馆</td><td>会客</td><td>茶室、品茗</td><td>书房、画室</td><td>高装标木饰面、茶台</td></tr>
+          <tr><td>9幢</td><td style="color:var(--g4)">礼序会客共享厅</td><td>会客</td><td>归家等候</td><td>邻里会客、轻办公</td><td>酒店式软座、香氛</td></tr>
+          <tr><td>10幢</td><td style="color:var(--g3)">知行活力馆</td><td>运动</td><td>预约自习</td><td>约45㎡健身区</td><td>健身地胶、跑步机</td></tr>
+          <tr><td>12幢</td><td style="color:var(--g3)">青年活力运动馆</td><td>运动</td><td>开放健身拉伸</td><td>乒乓+镜面运动</td><td>镜墙、木纹弹性地板</td></tr>
+          <tr><td>13幢</td><td style="color:var(--gold)">童梦成长乐园</td><td>家庭</td><td>软包童玩</td><td>亲子陪伴、手作</td><td>环保软包、防撞</td></tr>
+          <tr><td>14幢</td><td style="color:#F472B6">她享美学社交馆</td><td>女性</td><td>家庭欢聚</td><td>女王美学、按摩椅</td><td>装标≥19幢，柔光镜面</td></tr>
+          <tr style="background:rgba(190,24,93,0.08)"><td><strong style="color:#F472B6">15幢★</strong></td><td style="color:#F472B6"><strong>她享身心会馆</strong></td><td>女性</td><td>普拉提私教+封闭休憩</td><td>扩容瑜伽+冥想/拉伸房</td><td>全封闭、专业地胶、普拉提床</td></tr>
+          <tr><td>16幢</td><td style="color:var(--g4)">森氧自然疗愈厅</td><td>文化</td><td>园艺科普</td><td>展廊、冥想拉伸</td><td>绿植、除湿、柔光</td></tr>
+          <tr><td>17幢</td><td style="color:var(--g4)">邻里弈乐会馆</td><td>会客</td><td>大棋牌套房</td><td>小棋牌+卫生间</td><td>隔音、排风</td></tr>
+          <tr><td>18幢</td><td style="color:#A78BFA">轻学轻运动馆</td><td>女性/运动</td><td>预约自习</td><td>镜面运动多功能区</td><td>镜墙、软地胶</td></tr>
+          <tr><td>19幢</td><td style="color:var(--g4)">菁英商务会客厅</td><td>会客</td><td>绅士会所</td><td>商务会客洽谈</td><td>高装标，装标参考上限</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PAGE: ACTION ===== -->
+<div id="page-action" class="page">
+  <div class="sec-header">
+    <div class="sec-title">行动计划与跟进清单</div>
+    <div class="sec-desc">当前进展、待确认事项、业主承诺提供的材料</div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header"><div class="card-title">各楼幢方案上报状态</div><div class="card-sub">截至2026年7月7日</div></div>
+      <div class="card-body">
+        <div class="status-row"><div class="status-dot done"></div><div class="status-text"><strong>10幢</strong> 右侧麻将改健身房（约45㎡）已上报，等待审批</div><div class="status-badge badge-pending">等待审批</div></div>
+        <div class="status-row"><div class="status-dot done"></div><div class="status-text"><strong>12幢</strong> 东南角增加封闭休息区，已纳入上报方案</div><div class="status-badge badge-done">已上报</div></div>
+        <div class="status-row"><div class="status-dot pending"></div><div class="status-text"><strong>15幢</strong> 封闭扩大瑜伽+普拉提空间，已上报，细节待确认</div><div class="status-badge badge-pending">细节待定</div></div>
+        <div class="status-row"><div class="status-dot done"></div><div class="status-text"><strong>17幢</strong> 一大一小棋牌+公共卫生间，已纳入方案</div><div class="status-badge badge-done">已上报</div></div>
+        <div class="status-row"><div class="status-dot done"></div><div class="status-text"><strong>18幢</strong> 保持不变（左自习右麻将），尚未提出调整</div><div class="status-badge badge-todo">建议提出</div></div>
+        <div class="status-row" style="border:none"><div class="status-dot todo"></div><div class="status-text"><strong>下次品鉴团会议</strong> 预计2周后，需提前准备15幢方案应对反对意见</div><div class="status-badge badge-todo">约2周后</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">业主承诺提供的支撑材料</div><div class="card-sub">给华润的汇报数据包</div></div>
+      <div class="card-body">
+        <div class="status-row"><div class="status-dot pending"></div><div class="status-text">1幢楼幢问卷最终统计结果（剩余几户待填写）</div><div class="status-badge badge-pending">整理中</div></div>
+        <div class="status-row"><div class="status-dot pending"></div><div class="status-text">同类高端小区/互联网园区运动设施使用率对比数据</div><div class="status-badge badge-pending">待搜集</div></div>
+        <div class="status-row"><div class="status-dot done"></div><div class="status-text">专业运动地胶施工案例（浙音案例，已联系施工方）</div><div class="status-badge badge-done">已落实</div></div>
+        <div class="status-row" style="border:none"><div class="status-dot todo"></div><div class="status-text">架空层命名包装建议文案（"女神空间"等方向）</div><div class="status-badge badge-todo">待撰写</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:18px">
+    <div class="card">
+      <div class="card-header"><div class="card-title">地胶施工建议（已确认）</div><div class="card-sub">来源：舞房主理人建议（浙音施工方）</div></div>
+      <div class="card-body">
+        <div class="rec-box">
+          <h4>瑜伽舞房地面方案</h4>
+          <p>木地板打底 + 高品质仿木纹哑光运动地胶；确认地暖兼容不受影响；同样适用于健身房（替代现有较差橡胶地板）。</p>
+        </div>
+        <div class="rec-box">
+          <h4>施工资源</h4>
+          <p>已联系为浙江音乐学院铺装地胶的专业团队，可向华润提供案例参考，并推荐其与开发商合作团队对接。</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">向开发商汇报的口径建议</div><div class="card-sub">可直接使用的表述</div></div>
+      <div class="card-body">
+        <div class="quote">
+          <strong>数据支撑：</strong>沄璟业主问卷中，86.36%选择运动健身，95.45%需要跑步机区域，女性对瑜伽舞房"非常需要+需要"达76.92%，普拉提器械69.23%。麻将/桌游区每周4次以上使用者为0人，而瑜伽/普拉提为12人（54.55%）。
+        </div>
+        <div class="quote">
+          <strong>定位建议：</strong>建议将架空层从"泛会所"升级为"运动健康生活中心"，以跑步机和常规健身器械满足男女共同需求，以高品质瑜伽/普拉提空间回应年轻女性和品质家庭需求，提升公区活跃度、交付满意度和项目调性。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 下次品鉴会提前准备 -->
+  <div class="card">
+    <div class="card-header" style="background:rgba(190,24,93,0.08)">
+      <div class="card-title" style="color:#F472B6">⚠ 品鉴团会议预判（约2周后）</div>
+      <div class="card-sub">15幢方案可能遭遇的反对意见及应对逻辑</div>
+    </div>
+    <div class="card-body">
+      <div class="grid-2">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#F9A8D4;margin-bottom:10px">预计反对意见</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="background:rgba(239,68,68,0.08);border-radius:8px;padding:10px 14px;font-size:13px;color:#FCA5A5">教授型业主：西边封进来后，15幢业主怎么有地方坐？</div>
+            <div style="background:rgba(239,68,68,0.08);border-radius:8px;padding:10px 14px;font-size:13px;color:#FCA5A5">其他业主：为什么要把原有的开放空间封闭起来？</div>
+            <div style="background:rgba(239,68,68,0.08);border-radius:8px;padding:10px 14px;font-size:13px;color:#FCA5A5">开发商：成本怎么解决？</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--g3);margin-bottom:10px">应对逻辑</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="background:rgba(82,183,136,0.08);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--g4)">给15幢业主的封闭休息区≠压缩运动空间；两者并不冲突，左侧可独立做封闭休憩区</div>
+            <div style="background:rgba(82,183,136,0.08);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--g4)">原开放区实用性极低（几张桌子的陈列区），换成封闭运动区是"价值密度提升"</div>
+            <div style="background:rgba(82,183,136,0.08);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--g4)">瑜伽/普拉提是装标最高的空间之一（成本已投），不做好等于浪费已投资源</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer style="text-align:center;padding:24px;font-size:12px;color:var(--muted);border-top:1px solid var(--border);margin-top:40px">
+  沄璟架空层提升方案综合 Dashboard · 2026年7月7日 · 数据来源：1幢业主调研问卷（22份）+ 华润开发商沟通记录
+</footer>
+
+<script>
+// --- Navigation ---
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+const GN = '#52B788', GP = '#2D6A4F', GA = '#74C69D', FP = '#BE185D', FL = '#F472B6', BL = '#3B82F6';
+const MUTED = '#4B6B52';
+
+// ---- OVERVIEW Charts ----
+new Chart(document.getElementById('ov-needs'), {
+  type: 'radar',
+  data: {
+    labels: ['跑步机','健身器械','乒乓球','童玩区','瑜伽舞房','普拉提','自习室'],
+    datasets: [
+      { label: '非常需要+需要%', data: [95.45,90.91,50.00,72.73,68.18,59.09,40.91], backgroundColor: 'rgba(82,183,136,0.15)', borderColor: GN, pointBackgroundColor: GN, borderWidth: 2 },
+      { label: '非常需要%', data: [77.27,77.27,31.82,45.45,54.55,40.91,31.82], backgroundColor: 'rgba(190,24,93,0.1)', borderColor: FP, pointBackgroundColor: FP, borderWidth: 2 }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#7CA882', font: { size: 11 } } } }, scales: { r: { ticks: { display: false }, grid: { color: '#2A4035' }, pointLabels: { color: '#B7E4C7', font: { size: 11 } }, suggestedMax: 100 } } }
+});
+
+new Chart(document.getElementById('ov-freq'), {
+  type: 'bar',
+  data: {
+    labels: ['健身区','童玩区','瑜伽/普拉提','乒乓球','阅读/书画','自习室','待客/休息','麻将/桌游'],
+    datasets: [{ label: '每周4次+人数', data: [11,11,12,5,3,3,2,0], backgroundColor: [GP,GA,FL,BL,'#4B6B52','#4B6B52','#4B6B52','#EF4444'], borderRadius: 6 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.parsed.x}人 (${(c.parsed.x/22*100).toFixed(1)}%)` } } }, scales: { x: { max: 12, ticks: { color: MUTED, stepSize: 2 }, grid: { color: '#1C2E22' } }, y: { ticks: { color: '#B7E4C7', font: { size: 11 } } } } }
+});
+
+// ---- SURVEY Charts ----
+new Chart(document.getElementById('sv-hobbies'), {
+  type: 'bar',
+  data: {
+    labels: ['运动健身','阅读学习','瑜伽舞蹈','亲子活动','棋牌桌游','社交交流','书法绘画','科普探索'],
+    datasets: [{ label: '选择人数', data: [19,13,11,11,8,8,6,5], backgroundColor: [GP,GA,'#F472B6',GA,MUTED,GA,MUTED,MUTED], borderRadius: 6 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.parsed.x}人 (${(c.parsed.x/22*100).toFixed(1)}%)` } } }, scales: { x: { max: 22, ticks: { color: MUTED }, grid: { color: '#1C2E22' } }, y: { ticks: { color: '#B7E4C7', font: { size: 11 } } } } }
+});
+
+new Chart(document.getElementById('sv-needs'), {
+  type: 'bar',
+  data: {
+    labels: ['跑步机','健身器械','乒乓球','童玩区','瑜伽舞房','普拉提','自习室'],
+    datasets: [{ label: '非常需要+需要（人数）', data: [21,20,11,16,15,13,9], backgroundColor: [GP,GP,GA,GA,'#F472B6','#F472B6',MUTED], borderRadius: 6 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ` ${c.parsed.x}人 (${(c.parsed.x/22*100).toFixed(1)}%)` } } }, scales: { x: { max: 22, ticks: { color: MUTED }, grid: { color: '#1C2E22' } }, y: { ticks: { color: '#B7E4C7', font: { size: 11 } } } } }
+});
+
+new Chart(document.getElementById('sv-gender'), {
+  type: 'doughnut',
+  data: { labels: ['女性 13人','男性 9人'], datasets: [{ data: [59.09,40.91], backgroundColor: ['#BE185D','#3B82F6'], borderColor: '#152C1E', borderWidth: 3 }] },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '62%', plugins: { legend: { position: 'bottom', labels: { color: '#7CA882', font: { size: 11 } } } } }
+});
+
+new Chart(document.getElementById('sv-age'), {
+  type: 'doughnut',
+  data: { labels: ['18-25岁','26-35岁','36-45岁','46-55岁','56-65岁'], datasets: [{ data: [4.55,45.45,27.27,18.18,4.55], backgroundColor: ['#213529','#2D6A4F','#52B788','#74C69D','#95D5B2'], borderColor: '#152C1E', borderWidth: 3 }] },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '55%', plugins: { legend: { position: 'bottom', labels: { color: '#7CA882', font: { size: 11 }, boxWidth: 10 } } } }
+});
+
+new Chart(document.getElementById('sv-family'), {
+  type: 'doughnut',
+  data: { labels: ['1人','2人','3人','4人','5人+'], datasets: [{ data: [4.55,9.09,27.27,36.36,22.73], backgroundColor: ['#0D1B14','#213529','#40916C','#2D6A4F','#52B788'], borderColor: '#152C1E', borderWidth: 3 }] },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '55%', plugins: { legend: { position: 'bottom', labels: { color: '#7CA882', font: { size: 11 }, boxWidth: 10 } } } }
+});
+
+new Chart(document.getElementById('sv-freq-full'), {
+  type: 'bar',
+  data: {
+    labels: ['健身区','乒乓球区','待客/休息','瑜伽/普拉提','童玩区','阅读/书画','麻将/桌游','自习室'],
+    datasets: [
+      { label: '会使用', data: [95.45,86.36,86.36,77.27,77.27,77.27,77.27,72.73], backgroundColor: 'rgba(82,183,136,0.4)', borderRadius: 4 },
+      { label: '每周≥2次', data: [95.45,59.09,50,68.18,68.18,50,36.36,40.91], backgroundColor: 'rgba(82,183,136,0.7)', borderRadius: 4 },
+      { label: '每周≥4次', data: [50,22.73,9.09,54.55,50,13.64,0,13.64], backgroundColor: GN, borderRadius: 4 }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#7CA882', font: { size: 11 } } }, tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${c.parsed.y}%` } } }, scales: { x: { ticks: { color: '#B7E4C7', font: { size: 11 } } }, y: { max: 110, ticks: { callback: v => v + '%', color: MUTED }, grid: { color: '#1C2E22' } } } }
+});
+
+new Chart(document.getElementById('sv-gender-comp'), {
+  type: 'bar',
+  data: {
+    labels: ['常规健身器械','跑步机区域','瑜伽舞房','普拉提器械'],
+    datasets: [
+      { label: '男性（9人）', data: [88.89,88.89,33.33,44.44], backgroundColor: BL, borderRadius: 4 },
+      { label: '女性（13人）', data: [92.31,100,76.92,69.23], backgroundColor: FL, borderRadius: 4 }
+    ]
+  },
+  options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#7CA882', font: { size: 11 } } } }, scales: { y: { max: 110, ticks: { callback: v => v + '%', color: MUTED }, grid: { color: '#1C2E22' } }, x: { ticks: { color: '#B7E4C7', font: { size: 11 } } } } }
+});
+
+// ---- PLAN Charts ----
+new Chart(document.getElementById('pl-lines'), {
+  type: 'doughnut',
+  data: {
+    labels: ['女性友好线（3幢）','青年运动线（3幢）','家庭成长线（3幢）','礼序会客线（4幢）'],
+    datasets: [{ data: [3,3,3,4], backgroundColor: ['#BE185D','#1D4ED8','#D97706','#6D28D9'], borderColor: '#152C1E', borderWidth: 3 }]
+  },
+  options: { responsive: true, maintainAspectRatio: false, cutout: '50%', plugins: { legend: { position: 'bottom', labels: { color: '#7CA882', font: { size: 11 }, boxWidth: 12 } } } }
+});
+
+new Chart(document.getElementById('pl-bubble'), {
+  type: 'bubble',
+  data: {
+    datasets: [
+      { label: '健身/跑步', data: [{ x: 95, y: 50, r: 20 }], backgroundColor: 'rgba(45,106,79,0.7)' },
+      { label: '瑜伽/普拉提', data: [{ x: 59, y: 41, r: 15 }], backgroundColor: 'rgba(190,24,93,0.7)' },
+      { label: '乒乓球/童玩', data: [{ x: 73, y: 32, r: 12 }], backgroundColor: 'rgba(29,78,216,0.7)' },
+      { label: '自习室', data: [{ x: 45, y: 14, r: 8 }], backgroundColor: 'rgba(75,107,82,0.5)' },
+      { label: '麻将/桌游', data: [{ x: 40, y: 0, r: 6 }], backgroundColor: 'rgba(239,68,68,0.5)' },
+      { label: '会客/休息', data: [{ x: 86, y: 9, r: 8 }], backgroundColor: 'rgba(75,107,82,0.5)' },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { color: '#7CA882', font: { size: 10 }, boxWidth: 10 } }, tooltip: { callbacks: { label: c => ` ${c.dataset.label}: 需求${c.parsed.x}% / 高频用户${c.parsed.y}%` } } },
+    scales: {
+      x: { title: { display: true, text: '综合需求率(%)', color: MUTED, font: { size: 11 } }, min: 20, max: 110, ticks: { color: MUTED }, grid: { color: '#1C2E22' } },
+      y: { title: { display: true, text: '每周4次+用户比(%)', color: MUTED, font: { size: 11 } }, min: -5, max: 60, ticks: { color: MUTED }, grid: { color: '#1C2E22' } }
+    }
+  }
+});
+</script>
+</body>
+</html>

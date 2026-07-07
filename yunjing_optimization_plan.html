@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>沄璟架空层主题功能分区优化方案</title>
+<style>
+  :root {
+    --primary: #1B4332;
+    --primary2: #2D6A4F;
+    --green: #52B788;
+    --accent: #B7E4C7;
+    --gold: #C9A84C;
+    --female: #C06090;
+    --bg: #F0F7F4;
+    --card: #ffffff;
+    --text: #1B1B1B;
+    --muted: #6B7280;
+    --border: #E5E7EB;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+
+  /* Header */
+  .header { background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 50%, #40916C 100%); color: white; padding: 52px 40px 44px; }
+  .header-inner { max-width: 1200px; margin: 0 auto; }
+  .header-tag { display: inline-block; background: rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 16px; font-size: 12px; letter-spacing: 1.5px; margin-bottom: 18px; }
+  .header h1 { font-size: 30px; font-weight: 800; line-height: 1.4; margin-bottom: 10px; }
+  .header-slogan { font-size: 15px; opacity: 0.85; margin-bottom: 20px; }
+  .header-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+  .header-pill { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 5px 14px; font-size: 12px; }
+
+  /* Container */
+  .container { max-width: 1200px; margin: 0 auto; padding: 44px 20px; }
+
+  /* Section */
+  .section { margin-bottom: 52px; }
+  .section-title { font-size: 20px; font-weight: 700; color: var(--primary2); border-left: 4px solid var(--green); padding-left: 14px; margin-bottom: 24px; }
+
+  /* Principle cards */
+  .principle-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  @media (max-width: 900px) { .principle-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 500px) { .principle-grid { grid-template-columns: 1fr; } }
+  .principle-card { background: var(--card); border-radius: 12px; padding: 22px 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-top: 3px solid var(--green); }
+  .principle-card h4 { font-size: 14px; font-weight: 700; color: var(--primary2); margin-bottom: 8px; }
+  .principle-card p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+  /* Theme lines */
+  .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+  @media (max-width: 900px) { .theme-grid { grid-template-columns: repeat(2, 1fr); } }
+  .theme-card { background: var(--card); border-radius: 12px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .theme-icon { font-size: 28px; margin-bottom: 8px; }
+  .theme-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+  .theme-card ul { list-style: none; }
+  .theme-card ul li { font-size: 12px; color: var(--muted); padding: 2px 0; }
+  .theme-card ul li::before { content: "▸ "; color: var(--green); }
+
+  /* 楼幢总表 */
+  .zone-table { width: 100%; border-collapse: collapse; font-size: 13px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border-radius: 12px; overflow: hidden; }
+  .zone-table thead tr { background: var(--primary2); color: white; }
+  .zone-table th { padding: 12px 14px; text-align: left; font-weight: 600; font-size: 12px; }
+  .zone-table td { padding: 11px 14px; border-bottom: 1px solid #F0F7F4; vertical-align: top; line-height: 1.6; }
+  .zone-table tr:hover td { background: #F0F7F4; }
+  .zone-name { font-weight: 700; color: var(--primary2); white-space: nowrap; }
+  .upgrade-name { font-weight: 600; color: var(--gold); }
+  .pill-sm { display: inline-block; border-radius: 8px; padding: 1px 8px; font-size: 11px; font-weight: 600; }
+  .tag-sport { background: #D1FAE5; color: #065F46; }
+  .tag-female { background: #FCE7F3; color: #9D174D; }
+  .tag-family { background: #FEF3C7; color: #92400E; }
+  .tag-social { background: #EDE9FE; color: #5B21B6; }
+  .tag-culture { background: #E0F2FE; color: #0C4A6E; }
+
+  /* 逐楼幢详情 */
+  .building-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  @media (max-width: 768px) { .building-grid { grid-template-columns: 1fr; } }
+  .building-card { background: var(--card); border-radius: 14px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.08); }
+  .building-header { padding: 18px 20px 14px; }
+  .building-id { font-size: 24px; font-weight: 800; color: white; display: inline-block; width: 44px; height: 44px; border-radius: 10px; text-align: center; line-height: 44px; margin-bottom: 10px; }
+  .building-name { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+  .building-upgrade { font-size: 16px; font-weight: 800; }
+  .building-body { padding: 0 20px 20px; }
+  .func-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+  .func-box { background: var(--bg); border-radius: 8px; padding: 12px; }
+  .func-box-title { font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .func-box-content { font-size: 13px; line-height: 1.7; }
+  .standard-list { list-style: none; margin-top: 10px; }
+  .standard-list li { font-size: 12px; color: var(--muted); padding: 3px 0; display: flex; align-items: flex-start; gap: 6px; }
+  .standard-list li::before { content: "✓"; color: var(--green); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  /* 15幢特别标注 */
+  .highlight15 { background: linear-gradient(135deg, #FFF0F3, #FCE7F3); border: 2px solid #F9A8D4; }
+  .highlight15 .building-header { background: linear-gradient(135deg, #831843, #BE185D); }
+
+  /* 标准区 */
+  .standard-tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .std-tab { background: var(--card); border: 2px solid var(--border); border-radius: 8px; padding: 10px 18px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; }
+  .std-tab.active { background: var(--primary2); color: white; border-color: var(--primary2); }
+  .std-content { display: none; }
+  .std-content.active { display: block; }
+  .std-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  @media (max-width: 600px) { .std-grid { grid-template-columns: 1fr; } }
+  .std-item { background: var(--card); border-radius: 10px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .std-item h5 { font-size: 13px; font-weight: 600; color: var(--primary2); margin-bottom: 8px; }
+  .std-item p { font-size: 12px; color: var(--muted); line-height: 1.7; }
+
+  /* 案例参考 */
+  .ref-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (max-width: 600px) { .ref-grid { grid-column: 1fr; } }
+  .ref-card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-left: 4px solid var(--green); }
+  .ref-card h4 { font-size: 14px; font-weight: 700; color: var(--primary2); margin-bottom: 6px; }
+  .ref-card p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+  /* 四项关键决策 */
+  .decision-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (max-width: 600px) { .decision-grid { grid-template-columns: 1fr; } }
+  .decision-card { background: var(--card); border-radius: 12px; padding: 22px 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .decision-num { width: 32px; height: 32px; background: var(--primary2); color: white; border-radius: 50%; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+  .decision-card h4 { font-size: 14px; font-weight: 700; color: var(--primary2); margin-bottom: 8px; }
+  .decision-card p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+  /* Summary */
+  .summary-box { background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 100%); color: white; border-radius: 16px; padding: 40px; }
+  .summary-box h3 { font-size: 20px; font-weight: 800; margin-bottom: 20px; }
+  .summary-box ul { padding-left: 20px; }
+  .summary-box ul li { font-size: 14px; line-height: 2.2; opacity: 0.9; }
+  .summary-box ul li strong { color: #B7E4C7; }
+
+  footer { text-align: center; padding: 24px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 40px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-tag">架空层优化方案</div>
+    <h1>沄璟架空层主题功能分区<br>优化方案</h1>
+    <div class="header-slogan">沄璟全龄乐活会廊 · 面向年轻家庭与女性友好的复合型社区生活系统</div>
+    <div class="header-pills">
+      <div class="header-pill">数据来源：2026.07.05 开发商初稿</div>
+      <div class="header-pill">15幢平面沟通记录</div>
+      <div class="header-pill">1幢业主需求问卷（22份）</div>
+      <div class="header-pill">业主代表沟通记录</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- 总体定位 -->
+  <div class="section">
+    <div class="section-title">总体定位与核心原则</div>
+    <div class="principle-grid">
+      <div class="principle-card">
+        <h4>🏗 主题不推翻，表达再升级</h4>
+        <p>保留开发商已定的功能方向，但用更高级、更有营销价值的命名和场景重新包装。</p>
+      </div>
+      <div class="principle-card">
+        <h4>🔄 低频空间复合化</h4>
+        <p>书画、茶艺、讲堂、展廊、桌游、棋牌等空间，用可移动家具和预约机制做成可变场景。</p>
+      </div>
+      <div class="principle-card">
+        <h4>💪 高频运动功能做实</h4>
+        <p>健身、跑步、瑜伽、普拉提、拉伸、乒乓应配置专业地面、镜墙、器械、收纳、通风和清洁管理。</p>
+      </div>
+      <div class="principle-card">
+        <h4>⚖ 女性友好装标不低于男性向</h4>
+        <p>14幢女王空间和15幢女性运动空间的装修标准、私密性和传播感，不应低于19幢绅士会所。</p>
+      </div>
+    </div>
+
+    <!-- 四条功能主线 -->
+    <div style="margin-top: 24px;">
+      <div class="section-subtitle" style="font-size:15px;font-weight:700;color:var(--primary2);margin-bottom:14px;">四条功能主线</div>
+      <div class="theme-grid">
+        <div class="theme-card" style="border-top: 3px solid #E07DA0">
+          <div class="theme-icon">♀</div>
+          <h4 style="color:#9D174D">女性友好线</h4>
+          <ul><li>14幢：她享美学社交馆</li><li>15幢：她享身心会馆</li><li>18幢：轻运动多功能补充</li></ul>
+        </div>
+        <div class="theme-card" style="border-top: 3px solid #52B788">
+          <div class="theme-icon">🏋</div>
+          <h4 style="color:#065F46">青年运动线</h4>
+          <ul><li>10幢：健身区（约45㎡）</li><li>12幢：乒乓与轻运动</li><li>15幢：普拉提瑜伽</li></ul>
+        </div>
+        <div class="theme-card" style="border-top: 3px solid #FBBF24">
+          <div class="theme-icon">👨‍👩‍👧</div>
+          <h4 style="color:#92400E">家庭成长线</h4>
+          <ul><li>13幢：儿童活动</li><li>6幢：亲子课程</li><li>16幢：自然文化活动</li></ul>
+        </div>
+        <div class="theme-card" style="border-top: 3px solid #818CF8">
+          <div class="theme-icon">🏛</div>
+          <h4 style="color:#3730A3">礼序会客线</h4>
+          <ul><li>7/9幢：会所接待</li><li>19幢：商务会客</li><li>17幢：棋牌社交</li></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 一页版主题分区总表 -->
+  <div class="section">
+    <div class="section-title">一页版主题分区总表</div>
+    <div style="overflow-x: auto; border-radius: 12px;">
+      <table class="zone-table">
+        <thead>
+          <tr>
+            <th>楼幢</th>
+            <th>升级主题名称</th>
+            <th>主线</th>
+            <th>左侧功能场景</th>
+            <th>右侧功能场景</th>
+            <th>装标重点</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="zone-name">6幢</span></td>
+            <td><span class="upgrade-name">雅趣文化可变厅</span></td>
+            <td><span class="pill-sm tag-family">家庭成长</span></td>
+            <td>休闲游戏、桌游、轻影音</td>
+            <td>书画茶艺、手作讲堂</td>
+            <td>可移动桌椅、投影、展示架</td>
+          </tr>
+          <tr>
+            <td><span class="zone-name">7幢</span></td>
+            <td><span class="upgrade-name">云上书茶雅集馆</span></td>
+            <td><span class="pill-sm tag-social">礼序会客</span></td>
+            <td>茶室、品茗、静态会客</td>
+            <td>书房、画室、艺术阅读</td>
+            <td>高装标木饰面、茶台、艺术灯</td>
+          </tr>
+          <tr>
+            <td><span class="zone-name">9幢</span></td>
+            <td><span class="upgrade-name">礼序会客共享厅</span></td>
+            <td><span class="pill-sm tag-social">礼序会客</span></td>
+            <td>归家等候、访客接待</td>
+            <td>邻里会客、轻办公、洽谈</td>
+            <td>酒店式软座、边几、充电、香氛</td>
+          </tr>
+          <tr>
+            <td><span class="zone-name">10幢</span></td>
+            <td><span class="upgrade-name">知行活力馆</span></td>
+            <td><span class="pill-sm tag-sport">青年运动</span></td>
+            <td>预约自习、安静阅读</td>
+            <td>约45㎡健身区，有氧+基础力量</td>
+            <td>健身地胶、跑步机、力量器械</td>
+          </tr>
+          <tr>
+            <td><span class="zone-name">12幢</span></td>
+            <td><span class="upgrade-name">青年活力运动馆</span></td>
+            <td><span class="pill-sm tag-sport">青年运动</span></td>
+            <td>开放健身、拉伸热身、轻力量</td>
+            <td>乒乓球+镜面轻运动复合区</td>
+            <td>镜墙、木纹弹性地板、可移动球台</td>
+          </tr>
+          <tr>
+            <td><span class="zone-name">13幢</span></td>
+            <td><span class="upgrade-name">童梦成长乐园</span></td>
+            <td><span class="pill-sm tag-family">家庭成长</span></td>
+            <td>低龄儿童软包童玩</td>
+            <td>亲子陪伴、儿童阅读、手作课堂</td>
+            <td>环保软包、防撞、可擦洗墙面</td>
+          </tr>
+          <tr>
+            <td><span class="zone-name">14幢</span></td>
+            <td><span class="upgrade-name">她享美学社交馆</span></td>
+            <td><span class="pill-sm tag-female">女性友好</span></td>
+            <td>家庭欢聚、女友聚会、轻茶歇</td>
+            <td>女王美学空间、花艺美妆、按摩放松</td>
+            <td>装标≥19幢，柔光、镜面、艺术软装</td>
+          </tr>
+          <tr style="background:#FFF0F6">
+            <td><span class="zone-name" style="color:#BE185D">15幢 ★</span></td>
+            <td><span class="upgrade-name" style="color:#BE185D">她享身心会馆</span></td>
+            <td><span class="pill-sm tag-female">女性友好</span></td>
+            <td>封闭普拉提私教、独立休憩补给</td>
+            <td>扩容瑜伽舞房、原普拉提室→冥想/拉伸/私教房</td>
+            <td>全封闭优先、专业地胶、镜墙、普拉提床、新风</td>
+          </tr>
+          <tr>
+            <td><span class="zone-name">16幢</span></td>
+            <td><span class="upgrade-name">森氧自然疗愈厅</span></td>
+            <td><span class="pill-sm tag-culture">自然文化</span></td>
+            <td>自然科普、园艺花艺、社区讲堂</td>
+            <td>社区展廊、冥想拉伸、亲子自然课堂</td>
+            <td>绿植、可移动桌椅、柔光、除湿</td>
+          </tr>
+          <tr>
+            <td><span class="zone-name">17幢</span></td>
+            <td><span class="upgrade-name">邻里弈乐会馆</span></td>
+            <td><span class="pill-sm tag-social">礼序会客</span></td>
+            <td>大棋牌麻将套房</td>
+            <td>小棋牌室、茶歇等候、公共卫生间</td>
+            <td>隔音、排风、耐污墙面、舒适座椅</td>
+          </tr>
+          <tr>
+            <td><span class="zone-name">18幢</span></td>
+            <td><span class="upgrade-name">轻学轻运动馆</span></td>
+            <td><span class="pill-sm tag-female">女性友好</span></td>
+            <td>预约自习、安静阅读、轻办公</td>
+            <td>镜面运动多功能区，瑜伽/拉伸/形体/小班课</td>
+            <td>镜墙、软地胶、瑜伽垫、可移动桌椅</td>
+          </tr>
+          <tr>
+            <td><span class="zone-name">19幢</span></td>
+            <td><span class="upgrade-name">菁英商务会客厅</span></td>
+            <td><span class="pill-sm tag-social">礼序会客</span></td>
+            <td>绅士会所、商务社交</td>
+            <td>商务会客、洽谈、轻宴请</td>
+            <td>高装标但≤女性空间，皮质/木饰面/金属</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 15幢重点详解 -->
+  <div class="section">
+    <div class="section-title">15幢重点方案：她享身心会馆</div>
+    <div style="background: linear-gradient(135deg, #FFF0F6, #FCE7F3); border: 2px solid #F9A8D4; border-radius: 16px; padding: 32px;">
+      <div style="display:flex; gap:12px; align-items:center; margin-bottom:20px">
+        <div style="background:#BE185D; color:white; border-radius:8px; padding:8px 16px; font-weight:800; font-size:18px">15幢</div>
+        <div>
+          <div style="font-size:20px; font-weight:800; color:#BE185D">她享身心会馆</div>
+          <div style="font-size:13px; color:#9D174D; margin-top:2px">瑜伽 × 普拉提 × 私教预约 · 女性私享运动专区</div>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px">
+        <div style="background:white; border-radius:10px; padding:18px;">
+          <div style="font-size:12px; font-weight:600; color:#9D174D; margin-bottom:10px; text-transform:uppercase">左侧区域：封闭普拉提私教 + 独立休憩</div>
+          <ul style="list-style:none">
+            <li style="font-size:13px; padding:3px 0; color:#374151">✓ 普拉提私教课（预约制）</li>
+            <li style="font-size:13px; padding:3px 0; color:#374151">✓ 小班训练（2-4人）</li>
+            <li style="font-size:13px; padding:3px 0; color:#374151">✓ 15幢本楼业主封闭休憩区</li>
+            <li style="font-size:13px; padding:3px 0; color:#374151">✓ 独立动线，不穿越运动区</li>
+            <li style="font-size:13px; padding:3px 0; color:#374151">✓ 运动补给（饮水、毛巾、储物）</li>
+          </ul>
+        </div>
+        <div style="background:white; border-radius:10px; padding:18px;">
+          <div style="font-size:12px; font-weight:600; color:#9D174D; margin-bottom:10px; text-transform:uppercase">右侧区域：扩容瑜伽舞房 + 冥想拉伸</div>
+          <ul style="list-style:none">
+            <li style="font-size:13px; padding:3px 0; color:#374151">✓ 瑜伽、舞蹈、形体课</li>
+            <li style="font-size:13px; padding:3px 0; color:#374151">✓ 原普拉提室保留为封闭小房间</li>
+            <li style="font-size:13px; padding:3px 0; color:#374151">✓ 可改：冥想室 / 拉伸房 / 私教房</li>
+            <li style="font-size:13px; padding:3px 0; color:#374151">✓ 水吧区 → 考虑改为预约私教房</li>
+            <li style="font-size:13px; padding:3px 0; color:#374151">✓ 整体全封闭，保障私密性</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="background:white; border-radius:10px; padding:18px; margin-bottom:16px">
+        <div style="font-size:13px; font-weight:700; color:#BE185D; margin-bottom:12px">⚠ 关键修改要点（对开发商提案的问题）</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+          <div style="background:#FFF0F6; border-radius:8px; padding:12px">
+            <div style="font-size:12px; font-weight:600; color:#9D174D; margin-bottom:6px">❌ 当前开发商方案的问题</div>
+            <ul style="list-style:none">
+              <li style="font-size:12px; color:#6B7280; padding:2px 0">× 原普拉提室改为开放休息区</li>
+              <li style="font-size:12px; color:#6B7280; padding:2px 0">× 净增封闭面积极为有限</li>
+              <li style="font-size:12px; color:#6B7280; padding:2px 0">× 通道穿越导致瑜伽室私密性差</li>
+              <li style="font-size:12px; color:#6B7280; padding:2px 0">× 开放区运动后吹风感冒风险</li>
+              <li style="font-size:12px; color:#6B7280; padding:2px 0">× 不满足业主对封闭休息区的诉求</li>
+            </ul>
+          </div>
+          <div style="background:#ECFDF5; border-radius:8px; padding:12px">
+            <div style="font-size:12px; font-weight:600; color:#065F46; margin-bottom:6px">✅ 推荐修改方案</div>
+            <ul style="list-style:none">
+              <li style="font-size:12px; color:#374151; padding:2px 0">✓ 原普拉提室位置保留为封闭房间</li>
+              <li style="font-size:12px; color:#374151; padding:2px 0">✓ 左侧封闭区给15幢业主独立休憩</li>
+              <li style="font-size:12px; color:#374151; padding:2px 0">✓ 消除瑜伽室和休息区的通道穿越</li>
+              <li style="font-size:12px; color:#374151; padding:2px 0">✓ 水吧区改为私教房提升空间价值</li>
+              <li style="font-size:12px; color:#374151; padding:2px 0">✓ 剪力墙不可动，但封闭布局可优化</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#1B4332; color:white; border-radius:10px; padding:18px">
+        <div style="font-size:13px; font-weight:700; color:#B7E4C7; margin-bottom:10px">向开发商的包装建议</div>
+        <p style="font-size:13px; line-height:1.8; opacity:0.9">沄璟轻法式设计 + 之江气质，天然吸引年轻女性。瑜伽/普拉提每周4次以上潜在用户12人（54.55%），具备社群运营基础。将15幢定位为<strong style="color:#B7E4C7">「杭州之江最具品质的住宅女性运动会馆」</strong>，装标不低于19幢绅士会所，才能与开发商宣传"以业主为本"的定位匹配。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 逐楼幢详情（选取关键楼幢） -->
+  <div class="section">
+    <div class="section-title">重点楼幢详细方案</div>
+    <div class="building-grid">
+
+      <!-- 10幢 -->
+      <div class="building-card">
+        <div class="building-header" style="background: linear-gradient(135deg, #2D6A4F, #40916C);">
+          <div class="building-id" style="background:rgba(255,255,255,0.2)">10</div>
+          <div class="building-name" style="color:white">原：自习室+棋牌</div>
+          <div class="building-upgrade" style="color:#B7E4C7">知行活力馆</div>
+        </div>
+        <div class="building-body">
+          <div class="func-row">
+            <div class="func-box">
+              <div class="func-box-title">左侧</div>
+              <div class="func-box-content">预约自习<br>安静阅读<br>轻办公</div>
+            </div>
+            <div class="func-box">
+              <div class="func-box-title">右侧（约45㎡新增）</div>
+              <div class="func-box-content">有氧健身<br>基础力量器械<br>拉伸恢复</div>
+            </div>
+          </div>
+          <ul class="standard-list">
+            <li>健身地胶或橡胶地垫</li>
+            <li>跑步机2-3台、综合力量器械</li>
+            <li>静区与动区声学隔离</li>
+            <li>新风除湿、清洁消毒设施</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 12幢 -->
+      <div class="building-card">
+        <div class="building-header" style="background: linear-gradient(135deg, #1D4ED8, #3B82F6);">
+          <div class="building-id" style="background:rgba(255,255,255,0.2)">12</div>
+          <div class="building-name" style="color:white">原：青年运动</div>
+          <div class="building-upgrade" style="color:#BFDBFE">青年活力运动馆</div>
+        </div>
+        <div class="building-body">
+          <div class="func-row">
+            <div class="func-box">
+              <div class="func-box-title">左侧</div>
+              <div class="func-box-content">开放健身<br>拉伸热身<br>轻力量训练</div>
+            </div>
+            <div class="func-box">
+              <div class="func-box-title">右侧</div>
+              <div class="func-box-content">乒乓球台<br>镜面轻运动复合区<br>形体热身</div>
+            </div>
+          </div>
+          <ul class="standard-list">
+            <li>已有镜墙，充分利用</li>
+            <li>木纹弹性地板，平整耐用</li>
+            <li>可折叠乒乓球桌，灵活空间</li>
+            <li>储物挂架、消毒用品</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 14幢 -->
+      <div class="building-card">
+        <div class="building-header" style="background: linear-gradient(135deg, #9D174D, #DB2777);">
+          <div class="building-id" style="background:rgba(255,255,255,0.2)">14</div>
+          <div class="building-name" style="color:white">原：社交生活</div>
+          <div class="building-upgrade" style="color:#FCE7F3">她享美学社交馆</div>
+        </div>
+        <div class="building-body">
+          <div class="func-row">
+            <div class="func-box">
+              <div class="func-box-title">左侧</div>
+              <div class="func-box-content">家庭欢聚厅<br>女友茶歇<br>生日小聚</div>
+            </div>
+            <div class="func-box">
+              <div class="func-box-title">右侧</div>
+              <div class="func-box-content">女王美学空间<br>花艺美妆整理<br>按摩椅放松</div>
+            </div>
+          </div>
+          <ul class="standard-list">
+            <li>装标明确不低于19幢绅士会所</li>
+            <li>柔光灯带、镜面、艺术软装</li>
+            <li>按摩椅、香氛、花艺台</li>
+            <li>私密性设计（磨砂玻璃/软帘）</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 18幢 -->
+      <div class="building-card">
+        <div class="building-header" style="background: linear-gradient(135deg, #5B21B6, #7C3AED);">
+          <div class="building-id" style="background:rgba(255,255,255,0.2)">18</div>
+          <div class="building-name" style="color:white">原：自习+麻将（建议调整）</div>
+          <div class="building-upgrade" style="color:#EDE9FE">轻学轻运动馆</div>
+        </div>
+        <div class="building-body">
+          <div class="func-row">
+            <div class="func-box">
+              <div class="func-box-title">左侧（保留）</div>
+              <div class="func-box-content">预约自习<br>安静阅读<br>轻办公</div>
+            </div>
+            <div class="func-box">
+              <div class="func-box-title">右侧（建议改）</div>
+              <div class="func-box-content">镜面运动多功能区<br>瑜伽/拉伸/形体<br>小班课</div>
+            </div>
+          </div>
+          <ul class="standard-list">
+            <li>17幢已有棋牌，18幢右侧无需重复</li>
+            <li>镜墙+软地胶+可移动桌椅</li>
+            <li>补足15幢瑜伽容量</li>
+            <li>运动区与学习区视觉/声学隔离</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 统一装修标准 -->
+  <div class="section">
+    <div class="section-title">统一装修与运营标准</div>
+    <div class="standard-tabs">
+      <div class="std-tab active" onclick="switchTab('sport')">🏋 运动类空间</div>
+      <div class="std-tab" onclick="switchTab('female')">♀ 女性友好空间</div>
+      <div class="std-tab" onclick="switchTab('flex')">🔄 可变多功能空间</div>
+      <div class="std-tab" onclick="switchTab('social')">🏛 会所社交空间</div>
+    </div>
+    <div id="tab-sport" class="std-content active">
+      <div class="std-grid">
+        <div class="std-item"><h5>适用楼幢</h5><p>10幢、12幢、15幢、18幢</p></div>
+        <div class="std-item"><h5>地面标准</h5><p>专业防滑耐磨地胶或橡胶地垫；瑜伽区木纹弹性地板或高品质软地胶；避免廉价PVC塑胶地板。</p></div>
+        <div class="std-item"><h5>镜面与收纳</h5><p>整面或半墙镜墙；封闭式收纳柜（瑜伽垫/砖/泡沫轴）；挂钩、换鞋凳、饮水点。</p></div>
+        <div class="std-item"><h5>通风与清洁</h5><p>新风系统、排风、除湿、防霉前置；消毒湿巾、垃圾桶、器械清洁提示牌；定期巡检记录。</p></div>
+      </div>
+    </div>
+    <div id="tab-female" class="std-content">
+      <div class="std-grid">
+        <div class="std-item"><h5>适用楼幢</h5><p>14幢、15幢、18幢（兼顾10/12）</p></div>
+        <div class="std-item"><h5>私密性</h5><p>避免主通道穿越；长虹玻璃/磨砂膜/软帘遮挡；独立入口动线优先。</p></div>
+        <div class="std-item"><h5>舒适与美感</h5><p>柔光灯带+可调光；香氛/绿植；镜面、艺术灯、浅暖色材料；包包放置台、全身镜。</p></div>
+        <div class="std-item"><h5>装标底线</h5><p>女性空间装标不低于19幢绅士会所关键空间质感；避免"男性高端、女性凑合"的失衡感。</p></div>
+      </div>
+    </div>
+    <div id="tab-flex" class="std-content">
+      <div class="std-grid">
+        <div class="std-item"><h5>适用楼幢</h5><p>6幢、16幢、18幢，部分适用12幢</p></div>
+        <div class="std-item"><h5>家具策略</h5><p>可移动、可折叠、可收纳桌椅；场景切换无需改造；滑轮家具+储物柜系统。</p></div>
+        <div class="std-item"><h5>多媒体配置</h5><p>投影或移动电视屏；移动白板；可调节轨道灯适配讲座/桌游/展示/课程。</p></div>
+        <div class="std-item"><h5>运营机制</h5><p>预约制管理；活动公告板；物业定期组织主题课程；器材归位规范。</p></div>
+      </div>
+    </div>
+    <div id="tab-social" class="std-content">
+      <div class="std-grid">
+        <div class="std-item"><h5>适用楼幢</h5><p>7幢、9幢、14幢、17幢、19幢</p></div>
+        <div class="std-item"><h5>品质标准</h5><p>软装品质高于普通架空层；重点做灯光、座椅舒适度、边几、茶歇、充电和绿植香氛。</p></div>
+        <div class="std-item"><h5>棋牌空间</h5><p>隔音+排风+耐污墙面；舒适座椅；卫生间便利；避免大面积高装标堆砌。</p></div>
+        <div class="std-item"><h5>女性社交</h5><p>镜面、花艺台、柔光；商务会客配洽谈桌、会议屏、精致背景墙。</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 参考案例 -->
+  <div class="section">
+    <div class="section-title">风格参考案例</div>
+    <div class="ref-grid">
+      <div class="ref-card">
+        <h4>中海映山湖架空层：全龄一体化</h4>
+        <p>强调架空层从割裂功能房转向全龄、一体化、可互动社区空间，将健康乐活中心作为重要模块，运动融入日常生活。对沄璟10/12/15幢均有参考价值。</p>
+      </div>
+      <div class="ref-card">
+        <h4>华润深圳湾悦府：泛会所复合生活</h4>
+        <p>约2000㎡泛会所整合茶室、SPA、健身、儿童、书斋等复合功能，说明高端住宅应做复合生活方式体系，而非每个空间只放单一功能。</p>
+      </div>
+      <div class="ref-card">
+        <h4>Multifamily Wellness趋势：不只是跑步机</h4>
+        <p>海外高端住宅wellness已从"有健身房"升级为健康生态：运动+恢复+社群运营+灵活空间。沄璟10/12/15/18应形成"运动矩阵"而非单点配置。</p>
+      </div>
+      <div class="ref-card">
+        <h4>瑜伽/冥想空间设计原则（ArchDaily）</h4>
+        <p>需重视光线、通风、灵活开放空间、储物、更衣、卫生间。沄璟15幢应按专业瑜伽普拉提会馆标准深化，而非按普通开放休息区对待。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 四项关键决策 -->
+  <div class="section">
+    <div class="section-title">最需明确的四项关键决策</div>
+    <div class="decision-grid">
+      <div class="decision-card">
+        <div class="decision-num">1</div>
+        <h4>15幢尽量全封闭</h4>
+        <p>保留并扩大瑜伽舞房、普拉提室和私教/冥想/拉伸房；不要把普拉提室改为开放休息区。</p>
+      </div>
+      <div class="decision-card">
+        <div class="decision-num">2</div>
+        <h4>女性空间装标不低于男性向空间</h4>
+        <p>14幢女王空间和15幢女性运动空间，装修标准和质感感知不应低于19幢绅士会所和健身房。</p>
+      </div>
+      <div class="decision-card">
+        <div class="decision-num">3</div>
+        <h4>10/12/18形成运动功能矩阵</h4>
+        <p>补足健身、乒乓、瑜伽/拉伸和轻运动容量，避免所有运动需求挤压在15幢一处。</p>
+      </div>
+      <div class="decision-card">
+        <div class="decision-num">4</div>
+        <h4>低频主题空间复合化运营</h4>
+        <p>6幢/16幢等低频主题用可变家具和预约机制提高实际使用率，避免成为"换个名字摆桌椅"。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 总结 -->
+  <div class="summary-box">
+    <h3>优化方向总结</h3>
+    <ul>
+      <li><strong>不推翻</strong>已定楼幢功能主题，在原有方向上进行"主题升级、功能复合、性别友好深化"</li>
+      <li><strong>15幢</strong>升级为她享身心会馆，全封闭，配专业普拉提器械和完整女性运动配套</li>
+      <li><strong>14幢</strong>升级为她享美学社交馆，装标明确不低于19幢绅士会所</li>
+      <li><strong>12幢</strong>升级为青年活力运动馆，充分利用现有镜墙</li>
+      <li><strong>18幢右侧</strong>建议从麻将改为镜面运动多功能区，补足女性运动容量</li>
+      <li><strong>整体定位</strong>升级为"沄璟全龄乐活会廊"，有利于向上汇报和项目营销传播</li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>沄璟架空层主题功能分区优化方案 · 2026年7月7日</footer>
+
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.std-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.std-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
