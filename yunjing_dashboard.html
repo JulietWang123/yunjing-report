@@ -414,7 +414,116 @@
     </div>
   </div>
 </div>
+<!-- ===== 女性瑜伽/普拉提专项数据（嵌在survey页） ===== -->
+<div id="page-survey-female" class="page" style="display:none"></div>
 
+<script>
+// 将女性专项卡片注入survey页
+(function(){
+  var surveyPage = document.getElementById('page-survey');
+  var femaleBlock = document.createElement('div');
+  femaleBlock.innerHTML = `
+  <div style="margin-top:22px">
+    <div style="font-size:18px;font-weight:800;color:#F472B6;border-left:4px solid #BE185D;padding-left:14px;margin-bottom:20px">
+      女性业主瑜伽/普拉提专项需求
+    </div>
+    <!-- KPI行 -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px">
+      <div style="background:linear-gradient(135deg,#2D0B21,#4A1235);border:1px solid #BE185D;border-radius:12px;padding:20px 16px;text-align:center">
+        <div style="font-size:34px;font-weight:900;color:#F472B6;line-height:1">76.92<span style="font-size:16px">%</span></div>
+        <div style="font-size:11px;color:#FDA4AF;margin-top:6px">女性需要瑜伽舞房</div>
+        <div style="font-size:10px;color:#9D4E6E;margin-top:3px">13人中10人"非常+需要"</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#2D0B21,#4A1235);border:1px solid #BE185D;border-radius:12px;padding:20px 16px;text-align:center">
+        <div style="font-size:34px;font-weight:900;color:#F472B6;line-height:1">69.23<span style="font-size:16px">%</span></div>
+        <div style="font-size:11px;color:#FDA4AF;margin-top:6px">女性需要普拉提器械</div>
+        <div style="font-size:10px;color:#9D4E6E;margin-top:3px">13人中9人"非常+需要"</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#2D0B21,#4A1235);border:1px solid #BE185D;border-radius:12px;padding:20px 16px;text-align:center">
+        <div style="font-size:34px;font-weight:900;color:#F472B6;line-height:1">92.31<span style="font-size:16px">%</span></div>
+        <div style="font-size:11px;color:#FDA4AF;margin-top:6px">女性会使用瑜伽区</div>
+        <div style="font-size:10px;color:#9D4E6E;margin-top:3px">12人表示会使用</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#2D0B21,#4A1235);border:1px solid #BE185D;border-radius:12px;padding:20px 16px;text-align:center">
+        <div style="font-size:34px;font-weight:900;color:#F472B6;line-height:1">53.85<span style="font-size:16px">%</span></div>
+        <div style="font-size:11px;color:#FDA4AF;margin-top:6px">女性每周≥4次高频</div>
+        <div style="font-size:10px;color:#9D4E6E;margin-top:3px">7人预计每周4次以上</div>
+      </div>
+    </div>
+    <!-- 对比图+数据表 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">女性 vs 全体：瑜伽/普拉提需求对比</div>
+          <div class="card-sub">女性样本13人 vs 全体样本22人（"非常需要+需要"%）</div>
+        </div>
+        <div class="card-body">
+          <div style="position:relative;height:220px"><canvas id="sv-female-comp"></canvas></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">女性瑜伽/普拉提使用频率分布</div>
+          <div class="card-sub">女性13人样本，各频次预计人数</div>
+        </div>
+        <div class="card-body">
+          <div style="position:relative;height:220px"><canvas id="sv-female-freq"></canvas></div>
+        </div>
+      </div>
+    </div>
+    <!-- 洞察框 -->
+    <div style="background:rgba(190,24,93,0.1);border:1px solid #BE185D;border-radius:10px;padding:16px 20px;margin-top:14px">
+      <div style="font-size:13px;font-weight:600;color:#F472B6;margin-bottom:8px">💡 核心洞察</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.8">
+        女性对瑜伽舞房的需求率（76.92%）比全体样本（68.18%）高出 <strong style="color:#F472B6">8.74个百分点</strong>；
+        女性每周≥4次高频用户占女性总数 53.85%，高于全体的 54.55% 中有更强的使用意愿集中度。
+        考虑到女性占全体样本的 59.09%，<strong style="color:#F472B6">瑜伽/普拉提本质上是女性主导的刚需场景</strong>，
+        应与健身跑步区一起列为架空层第一优先级。
+      </div>
+    </div>
+  </div>`;
+  surveyPage.appendChild(femaleBlock.firstElementChild);
+
+  // 渲染图表
+  setTimeout(function(){
+    var GN = '#52B788', FL = '#F472B6', FD = '#BE185D', MUTED = '#4B6B52';
+    // 女性 vs 全体对比柱图
+    new Chart(document.getElementById('sv-female-comp'), {
+      type: 'bar',
+      data: {
+        labels: ['瑜伽舞房\n非常需要', '瑜伽舞房\n总需要', '普拉提器械\n非常需要', '普拉提器械\n总需要'],
+        datasets: [
+          { label: '全体（22人）', data: [54.55, 68.18, 40.91, 59.09], backgroundColor: 'rgba(82,183,136,0.5)', borderColor: GN, borderWidth: 1.5, borderRadius: 4 },
+          { label: '女性（13人）', data: [69.23, 76.92, 53.85, 69.23], backgroundColor: 'rgba(190,24,93,0.6)', borderColor: FD, borderWidth: 1.5, borderRadius: 4 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { color: '#7CA882', font: { size: 11 } } }, tooltip: { callbacks: { label: function(c){ return ' ' + c.dataset.label + ': ' + c.parsed.y + '%'; } } } },
+        scales: { y: { max: 90, ticks: { callback: function(v){ return v + '%'; }, color: MUTED }, grid: { color: '#1C2E22' } }, x: { ticks: { color: '#B7E4C7', font: { size: 10 } } } }
+      }
+    });
+    // 女性频率分布
+    new Chart(document.getElementById('sv-female-freq'), {
+      type: 'bar',
+      data: {
+        labels: ['每周1次', '每周2-3次', '每周4-5次', '每周6次+', '不会使用'],
+        datasets: [{
+          label: '女性人数（13人）',
+          data: [1, 3, 5, 3, 1],
+          backgroundColor: ['rgba(190,24,93,0.35)','rgba(190,24,93,0.5)','rgba(190,24,93,0.75)','rgba(190,24,93,0.95)','rgba(75,107,82,0.4)'],
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(c){ return ' ' + c.parsed.y + '人 (' + (c.parsed.y/13*100).toFixed(1) + '%)'; } } } },
+        scales: { y: { max: 6, ticks: { stepSize: 1, color: MUTED }, grid: { color: '#1C2E22' } }, x: { ticks: { color: '#B7E4C7', font: { size: 11 } } } }
+      }
+    });
+  }, 300);
+})();
+</script>
 <!-- ===== PAGE: PLAN ===== -->
 <div id="page-plan" class="page">
   <div class="sec-header">
