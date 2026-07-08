@@ -109,9 +109,25 @@
 
   /* Footer */
   footer { text-align: center; padding: 24px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 40px; }
+
+  /* Breadcrumb navigation */
+  .breadcrumb-bar { display: flex; align-items: center; gap: 8px; padding: 10px 32px; background: #fff; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .breadcrumb-back { color: var(--primary); text-decoration: none; font-weight: 600; transition: opacity 0.2s; }
+  .breadcrumb-back:hover { opacity: 0.7; }
+  .breadcrumb-sep { color: #ccc; }
+  .breadcrumb-current { color: var(--text-muted); }
+  @media (max-width: 768px) { .breadcrumb-bar { padding: 10px 16px; font-size: 12px; } }
+
 </style>
 </head>
 <body>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb-bar">
+  <a href="index.html" class="breadcrumb-back">&#8592; 返回报告中心</a>
+  <span class="breadcrumb-sep">/</span>
+  <span class="breadcrumb-current">业主需求调研报告</span>
+</div>
 
 <div class="header">
   <div class="header-inner">
