@@ -160,12 +160,17 @@
   /* Quote */
   .quote { background: var(--bg2); border-left: 3px solid var(--g3); border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 14px 0; font-size: 13px; color: var(--muted); line-height: 1.8; }
   .quote strong { color: var(--text); }
+
+  .topnav-home { color: var(--gold); text-decoration: none; font-size: 13px; font-weight: 600; margin-right: 16px; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--gold); transition: all 0.2s; white-space: nowrap; }
+  .topnav-home:hover { background: var(--gold); color: #fff; }
+
 </style>
 </head>
 <body>
 
 <!-- Top Nav -->
 <div class="topnav">
+  <a href="index.html" class="topnav-home" title="返回报告中心">&#8592; 报告中心</a>
   <div class="topnav-brand">沄璟 · 架空层提升方案 Dashboard</div>
   <div class="topnav-links">
     <button class="nav-link active" onclick="showPage('overview')">概览</button>
