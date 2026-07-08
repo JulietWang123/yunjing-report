@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>沄璟架空层提升方案 · 阅读指南</title>
+  <style>
+    :root {
+      --primary: #2D6A4F;
+      --primary-light: #52B788;
+      --accent: #B7E4C7;
+      --gold: #C9A84C;
+      --bg: #F8FAF9;
+      --card: #ffffff;
+      --text: #1B1B1B;
+      --text-muted: #6B7280;
+      --border: #E5E7EB;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); line-height: 1.8; }
+
+    /* Hero */
+    .hero { background: linear-gradient(135deg, var(--primary) 0%, #1B4332 100%); color: white; padding: 56px 40px 48px; text-align: center; }
+    .hero-badge { display: inline-block; background: rgba(255,255,255,0.15); border-radius: 20px; padding: 5px 18px; font-size: 13px; letter-spacing: 2px; margin-bottom: 20px; }
+    .hero h1 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+    .hero-sub { font-size: 15px; opacity: 0.8; max-width: 600px; margin: 0 auto; }
+    .hero-meta { margin-top: 24px; font-size: 13px; opacity: 0.65; display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
+
+    /* Container */
+    .container { max-width: 860px; margin: 0 auto; padding: 40px 24px; }
+
+    /* Section */
+    .section { margin-bottom: 48px; }
+    .section-title { font-size: 18px; font-weight: 700; color: var(--primary); border-left: 4px solid var(--primary-light); padding-left: 14px; margin-bottom: 20px; }
+    .section-intro { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.9; }
+
+    /* KPI Row */
+    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+    @media (max-width: 640px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+    .kpi-card { background: var(--card); border-radius: 12px; padding: 20px 16px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid var(--border); }
+    .kpi-num { font-size: 30px; font-weight: 800; color: var(--primary); line-height: 1.1; }
+    .kpi-num.gold { color: var(--gold); }
+    .kpi-label { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+
+    /* Page Cards */
+    .page-list { display: flex; flex-direction: column; gap: 16px; }
+    .page-card { background: var(--card); border-radius: 14px; padding: 28px 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid var(--border); display: flex; gap: 20px; align-items: flex-start; transition: transform 0.15s, box-shadow 0.15s; text-decoration: none; color: inherit; }
+    .page-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.10); }
+    @media (max-width: 640px) { .page-card { flex-direction: column; padding: 20px; } }
+    .page-icon { font-size: 36px; flex-shrink: 0; width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+    .page-icon.report { background: #D1FAE5; }
+    .page-icon.dash { background: #1B4332; color: white; font-size: 28px; }
+    .page-icon.plan { background: #FEF3C7; }
+    .page-info { flex: 1; }
+    .page-tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 1px; padding: 2px 8px; border-radius: 4px; margin-bottom: 6px; }
+    .page-tag.report { background: #D1FAE5; color: #065F46; }
+    .page-tag.dash { background: #1B4332; color: #B7E4C7; }
+    .page-tag.plan { background: #FEF3C7; color: #92400E; }
+    .page-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+    .page-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 10px; }
+    .page-features { display: flex; flex-wrap: wrap; gap: 6px; }
+    .feature-tag { font-size: 11px; padding: 3px 10px; border-radius: 10px; background: #F3F4F6; color: var(--text-muted); }
+    .page-arrow { font-size: 20px; color: var(--primary-light); flex-shrink: 0; margin-top: 14px; }
+
+    /* Nav Guide */
+    .nav-guide { background: linear-gradient(135deg, #F0FAF4 0%, #FAFDF7 100%); border-radius: 14px; padding: 28px 30px; border: 1px solid var(--accent); }
+    .nav-guide h3 { font-size: 16px; font-weight: 700; color: var(--primary); margin-bottom: 16px; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #E0EFE5; font-size: 13px; }
+    .nav-item:last-child { border-bottom: none; }
+    .nav-from { font-weight: 600; color: var(--text); min-width: 110px; }
+    .nav-arrow { color: var(--primary-light); }
+    .nav-to { color: var(--primary); font-weight: 600; }
+
+    /* Key Points */
+    .points-list { display: flex; flex-direction: column; gap: 14px; }
+    .point-item { background: var(--card); border-radius: 12px; padding: 20px 22px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid var(--border); border-left: 4px solid var(--primary-light); display: flex; gap: 14px; align-items: flex-start; }
+    .point-num { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: white; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .point-text { font-size: 14px; line-height: 1.7; }
+    .point-text strong { color: var(--primary); }
+
+    /* Footer */
+    footer { text-align: center; padding: 32px 24px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border); }
+    footer a { color: var(--primary); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-badge">YUNJING STILT FLOOR · READING GUIDE</div>
+  <h1>沄璟架空层提升方案</h1>
+  <div class="hero-sub">基于1幢22份业主问卷调研，围绕运动健康需求与女性友好空间的完整分析与优化建议</div>
+  <div class="hero-meta">
+    <span>● 数据采集：2026年7月6日</span>
+    <span>● 22份有效问卷</span>
+    <span>● 1幢业主参与</span>
+    <span>● 报告整理：2026年7月8日</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- 导语 -->
+  <div class="section">
+    <div class="section-title">📝 写在前面</div>
+    <div class="section-intro">
+      以下是沄璟1幢业主围绕<strong>架空层运动健康空间</strong>的需求调研结果与分区优化方案。我们已将全部内容整理为线上页面，方便随时查阅和分享给团队。
+      <br><br>
+      建议按顺序从「调研报告」开始阅读——它是所有方案的数据基础；然后查看「综合 Dashboard」快速浏览全貌；最后深入「分区优化方案」了解每幢楼的具体建议。
+      <br><br>
+      所有子页面顶部均有<strong>「← 返回报告中心」</strong>导航，随时可以回到首页。
+    </div>
+  </div>
+
+  <!-- 核心数据 -->
+  <div class="section">
+    <div class="section-title">📊 关键数据一览</div>
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-num">95%</div>
+        <div class="kpi-label">需要跑步机区域</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">92%</div>
+        <div class="kpi-label">女业主会使用瑜伽区</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num gold">55%</div>
+        <div class="kpi-label">瑜伽/普拉提高频用户<br>（每周≥4次）</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num gold">0</div>
+        <div class="kpi-label">麻将/桌游高频用户</div>
+      </div>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-num">59%</div>
+        <div class="kpi-label">女性业主占比</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">73%</div>
+        <div class="kpi-label">26-45岁主力客群</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">86%</div>
+        <div class="kpi-label">3人及以上家庭</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-num">86%</div>
+        <div class="kpi-label">选"运动健身"为首要兴趣</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 页面导航 -->
+  <div class="section">
+    <div class="section-title">📑 内容页面</div>
+    <div class="page-list">
+
+      <!-- Page 1: Survey Report -->
+      <a class="page-card" href="yunjing_survey_report.html">
+        <div class="page-icon report">📊</div>
+        <div class="page-info">
+          <span class="page-tag report">REPORT 01</span>
+          <h3>业主需求调研报告</h3>
+          <div class="page-desc">22份问卷的完整数据分析。含核心数据速览、五大核心结论、11张可视化图表（兴趣爱好、需求强度、使用频率、性别交叉分析、家庭结构），以及各楼幢三档空间配置建议对比表。</div>
+          <div class="page-features">
+            <span class="feature-tag">11张图表</span>
+            <span class="feature-tag">性别交叉分析</span>
+            <span class="feature-tag">三档配置方案</span>
+            <span class="feature-tag">数据驱动</span>
+          </div>
+        </div>
+        <span class="page-arrow">→</span>
+      </a>
+
+      <!-- Page 2: Dashboard -->
+      <a class="page-card" href="yunjing_dashboard.html">
+        <div class="page-icon dash">📱</div>
+        <div class="page-info">
+          <span class="page-tag dash">DASHBOARD · 推荐阅读</span>
+          <h3>综合 Dashboard</h3>
+          <div class="page-desc">一体化深色主题看板，顶部切换4个页面：<strong>概览</strong>（关键KPI + 项目定位）→ <strong>需求调研</strong>（数据摘要 + 女性专项分析）→ <strong>分区方案</strong>（12幢升级总表 + 15幢重点分析 + 开发商包装建议）→ <strong>施工建议</strong>（地面方案与工程要点）。</div>
+          <div class="page-features">
+            <span class="feature-tag">4页切换</span>
+            <span class="feature-tag">15幢开发商建议</span>
+            <span class="feature-tag">12幢升级总表</span>
+            <span class="feature-tag">深色主题</span>
+          </div>
+        </div>
+        <span class="page-arrow">→</span>
+      </a>
+
+      <!-- Page 3: Optimization Plan -->
+      <a class="page-card" href="yunjing_optimization_plan.html">
+        <div class="page-icon plan">🏗</div>
+        <div class="page-info">
+          <span class="page-tag plan">REPORT 02</span>
+          <h3>架空层分区优化方案</h3>
+          <div class="page-desc">12幢逐楼幢详细升级方案。含完整功能分区总表（楼幢 → 主题 → 左右侧功能 → 装标重点）、15幢云境美塑会馆深入分析（问题诊断 + 推荐布局 + 包装建议）、可切换Tab按楼幢或按功能主线查看。</div>
+          <div class="page-features">
+            <span class="feature-tag">12幢逐楼方案</span>
+            <span class="feature-tag">15幢详解</span>
+            <span class="feature-tag">可交互Tab</span>
+            <span class="feature-tag">装标对照</span>
+          </div>
+        </div>
+        <span class="page-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- 页面导航说明 -->
+  <div class="section">
+    <div class="section-title">🔗 如何在不同页面间跳转</div>
+    <div class="nav-guide">
+      <div class="nav-item">
+        <span class="nav-from">调研报告页</span>
+        <span class="nav-arrow">→</span>
+        <span class="nav-to">顶部面包屑点击「← 返回报告中心」</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-from">综合 Dashboard</span>
+        <span class="nav-arrow">→</span>
+        <span class="nav-to">顶部导航栏左侧金色按钮「← 报告中心」</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-from">分区优化方案</span>
+        <span class="nav-arrow">→</span>
+        <span class="nav-to">顶部导航返回报告中心首页</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-from">报告中心首页</span>
+        <span class="nav-arrow">→</span>
+        <span class="nav-to">使用「📌 快速跳转」按钮或下方卡片进入任一子页面</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 核心诉求 -->
+  <div class="section">
+    <div class="section-title">🎯 核心诉求摘要</div>
+    <div class="points-list">
+      <div class="point-item">
+        <div class="point-num">1</div>
+        <div class="point-text"><strong>运动健身是第一优先级。</strong>95% 业主需要跑步机区域，86% 选「运动健身」为首要兴趣爱好。跑步机、常规健身器械和瑜伽/普拉提应作为架空层配置的核心功能。</div>
+      </div>
+      <div class="point-item">
+        <div class="point-num">2</div>
+        <div class="point-text"><strong>15幢女性运动空间是核心诉求。</strong>开发商当前方案将原普拉提室改为开放休息区不够合理——通道穿越破坏私密性、开放区运动后易感冒、未满足「封闭带空调休息区」的明确诉求。建议全封闭设计，打造女性私享运动专区。</div>
+      </div>
+      <div class="point-item">
+        <div class="point-num">3</div>
+        <div class="point-text"><strong>12幢各有明确定位。</strong>从运动（10/12幢）到会客（7/9/17/19幢）到家庭（13幢）到女性（14/15幢）到文化（6/16幢）到学习（18幢），每幢都有清晰主题和装标建议，详见分区优化方案总表。</div>
+      </div>
+      <div class="point-item">
+        <div class="point-num">4</div>
+        <div class="point-text"><strong>装标建议不低于19幢水准。</strong>尤其15幢云境美塑会馆，建议定位为「杭州之江最具品质的住宅女性运动会馆」，与沄璟轻法式设计气质匹配，也能够与「以业主为本」的宣传定位保持一致。</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  沄璟1幢业主调研报告 · 2026年7月 · 数据来源：22份有效问卷<br>
+  <a href="index.html">返回报告中心首页</a>
+</footer>
+
+</body>
+</html>
