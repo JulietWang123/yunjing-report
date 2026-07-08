@@ -50,11 +50,13 @@
     .page-icon { font-size: 36px; flex-shrink: 0; width: 56px; height: 56px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
     .page-icon.report { background: #D1FAE5; }
     .page-icon.dash { background: #1B4332; color: white; font-size: 28px; }
+    .page-icon.light { background: #DBEAFE; }
     .page-icon.plan { background: #FEF3C7; }
     .page-info { flex: 1; }
     .page-tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 1px; padding: 2px 8px; border-radius: 4px; margin-bottom: 6px; }
     .page-tag.report { background: #D1FAE5; color: #065F46; }
     .page-tag.dash { background: #1B4332; color: #B7E4C7; }
+    .page-tag.light { background: #DBEAFE; color: #1E40AF; }
     .page-tag.plan { background: #FEF3C7; color: #92400E; }
     .page-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
     .page-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 10px; }
@@ -106,7 +108,7 @@
     <div class="section-intro">
       以下是沄璟1幢业主围绕<strong>架空层运动健康空间</strong>的需求调研结果与分区优化方案。我们已将全部内容整理为线上页面，方便随时查阅和分享给团队。
       <br><br>
-      建议按顺序从「调研报告」开始阅读——它是所有方案的数据基础；然后查看「综合 Dashboard」快速浏览全貌；最后深入「分区优化方案」了解每幢楼的具体建议。
+      建议按顺序从「调研报告」开始阅读——它是所有方案的数据基础；然后查看「综合 Dashboard」或「简洁版 Dashboard」快速浏览全貌；最后深入「分区优化方案」了解每幢楼的具体建议。
       <br><br>
       所有子页面顶部均有<strong>「← 返回报告中心」</strong>导航，随时可以回到首页。
     </div>
@@ -175,7 +177,7 @@
         <span class="page-arrow">→</span>
       </a>
 
-      <!-- Page 2: Dashboard -->
+      <!-- Page 2: Dashboard (dark) -->
       <a class="page-card" href="yunjing_dashboard.html">
         <div class="page-icon dash">📱</div>
         <div class="page-info">
@@ -192,7 +194,24 @@
         <span class="page-arrow">→</span>
       </a>
 
-      <!-- Page 3: Optimization Plan -->
+      <!-- Page 3: Light Dashboard (yunjing-pages) -->
+      <a class="page-card" href="https://julietwang123.github.io/yunjing-pages/" target="_blank">
+        <div class="page-icon light">💡</div>
+        <div class="page-info">
+          <span class="page-tag light">DASHBOARD · 简洁版</span>
+          <h3>简洁版 Dashboard</h3>
+          <div class="page-desc">轻量一页式浅色看板，适合快速浏览和移动端分享。包含<strong>关键信号</strong>（4项核心KPI + 功能需求强度 + 使用频率分析）、<strong>15幢云境美塑会馆</strong>（问题诊断 + 推荐方案 + 优化平面图）、<strong>楼幢矩阵</strong>（12幢主题升级总表，含原主题 → 升级主题 → 左右功能 → 装标重点的完整对照）。</div>
+          <div class="page-features">
+            <span class="feature-tag">一页式滚动</span>
+            <span class="feature-tag">移动端友好</span>
+            <span class="feature-tag">15幢平面图</span>
+            <span class="feature-tag">12幢矩阵总表</span>
+          </div>
+        </div>
+        <span class="page-arrow">↗</span>
+      </a>
+
+      <!-- Page 4: Optimization Plan -->
       <a class="page-card" href="yunjing_optimization_plan.html">
         <div class="page-icon plan">🏗</div>
         <div class="page-info">
@@ -225,6 +244,11 @@
         <span class="nav-from">综合 Dashboard</span>
         <span class="nav-arrow">→</span>
         <span class="nav-to">顶部导航栏左侧金色按钮「← 报告中心」</span>
+      </div>
+      <div class="nav-item">
+        <span class="nav-from">简洁版 Dashboard</span>
+        <span class="nav-arrow">→</span>
+        <span class="nav-to">页面底部「← 报告中心」链接（独立站点，新标签页打开）</span>
       </div>
       <div class="nav-item">
         <span class="nav-from">分区优化方案</span>
