@@ -660,6 +660,17 @@
 
 <script>
 // --- Navigation ---
+// Hash-based routing for direct tab links
+function handleHash() {
+  var hash = window.location.hash.replace('#', '');
+  var pages = ['page-overview', 'page-survey', 'page-plan', 'page-action'];
+  if (pages.indexOf(hash) !== -1) {
+    showPage(hash.replace('page-', ''));
+  }
+}
+window.addEventListener('hashchange', handleHash);
+window.addEventListener('DOMContentLoaded', handleHash);
+
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
